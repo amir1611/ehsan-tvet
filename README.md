@@ -13,7 +13,7 @@ npm start
 
 Landing page: http://localhost:4180. Admin: http://localhost:4180/admin.
 
-On the first run a random admin password is printed once. Set `ADMIN_PASSWORD` before the first run to choose it. Only a salted scrypt hash is saved. Runtime data lives in `data/` (ignored by Git). Sessions expire after eight hours and are cleared on restart.
+Users live in `data/users.json` and the audit log in `data/audit.json`. Roles: Pentadbir (everything, plus users and audit log), Penyunting (site content and programs) and Staf Pertanyaan (enquiries). On the first run a first admin user (`admin`, or `ADMIN_USERNAME`) is created and a random password is printed once; an existing `credentials.json` is migrated to this user. To reset everything, delete `data/users.json` and start with `ADMIN_PASSWORD=...`. Set `ADMIN_PASSWORD` before the first run to choose it. Only a salted scrypt hash is saved. Runtime data lives in `data/` (ignored by Git). Sessions expire after eight hours and are cleared on restart.
 
 ## Brand
 

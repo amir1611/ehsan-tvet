@@ -25,7 +25,7 @@ if (!$('#login-view').hidden) enter($('#login-form').children, { step: 80 });
 // Each time a tab or wizard step renders, content fades in one block after another.
 const content = $('#admin-content');
 new MutationObserver(() => {
-  const blocks = content.querySelectorAll('.admin-stats .stat, .welcome-card, .admin-card, .admin-card > h2, .admin-actions, .stepper li, #wizard-form > *, .upload-box, .review, .pager');
+  const blocks = content.querySelectorAll('.admin-stats .stat, .welcome-card, .admin-card, .admin-card > h2, .admin-actions, .stepper li, #wizard-form > *, .subtabs, #site-form > *, #user-form > *, #pw-form > *, .role-legend > *, .upload-box, .review, .pager');
   enter([...blocks].filter(el => !el.closest('.table-scroll')), { delay: 80, step: 55 });
   enter(content.querySelectorAll('.admin-table tbody tr'), { y: 10, delay: 200, step: 45, duration: 450 });
 }).observe(content, { childList: true });

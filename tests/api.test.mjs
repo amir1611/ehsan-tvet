@@ -15,8 +15,8 @@ test('protected editing, enquiry flow, persistence and logout',async()=>{
 assert.equal((await call('/')).status,200);assert.equal((await call('/admin')).status,200);
 assert.equal((await call('/api/enquiries')).status,401);
 assert.equal((await call('/api/content','PUT',{})).status,401);
-assert.equal((await call('/api/login','POST',{password:'wrong'})).status,401);
-const login=await call('/api/login','POST',{password:'test-only-password'});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];assert.match(login.headers.get('set-cookie'),/HttpOnly/);
+assert.equal((await call('/api/login','POST',{username:'admin',password:'wrong'})).status,401);
+const login=await call('/api/login','POST',{username:'admin',password:'test-only-password'});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];assert.match(login.headers.get('set-cookie'),/HttpOnly/);
 let content=await(await call('/api/content')).json();content.heroTitle='Tajuk ujian\nBaris kedua';content.courses[0].fee='RM 9,400';assert.equal((await call('/api/content','PUT',content,cookie)).status,200);
 assert.equal((await call('/api/content','PUT',{},cookie)).status,400);
 assert.equal((await call('/api/enquiries','POST',{name:'Test'})).status,400);
@@ -25,7 +25,14 @@ const results=await Promise.all(Array.from({length:3},()=>call('/api/enquiries',
 let enquiries=await(await call('/api/enquiries','GET',null,cookie)).json();assert.equal(enquiries.length,3);
 assert.equal((await call('/api/enquiries/'+enquiries[0].id,'PATCH',{status:'Dihubungi'},cookie)).status,200);
 const cross=await fetch(base+'/api/content',{method:'PUT',headers:{Origin:'https://other.example','Content-Type':'application/json',Cookie:cookie},body:JSON.stringify(content)});assert.equal(cross.status,403);
-await stop();await start();const logged=await call('/api/login','POST',{password:'test-only-password'}),newCookie=logged.headers.get('set-cookie').split(';')[0];
+const mk=await call('/api/users','POST',{username:'penyunting',name:'Penyunting',role:'editor',password:'editor-pass-1'},cookie);assert.equal(mk.status,201);const staffMk=await call('/api/users','POST',{username:'staf',name:'Staf',role:'staff',password:'staff-pass-12'},cookie);assert.equal(staffMk.status,201);
+const ed=(await call('/api/login','POST',{username:'penyunting',password:'editor-pass-1'})).headers.get('set-cookie').split(';')[0],st=(await call('/api/login','POST',{username:'staf',password:'staff-pass-12'})).headers.get('set-cookie').split(';')[0];
+assert.equal((await call('/api/content','PUT',content,ed)).status,200);assert.equal((await call('/api/enquiries','GET',null,ed)).status,403);assert.equal((await call('/api/users','GET',null,ed)).status,403);assert.equal((await call('/api/audit','GET',null,ed)).status,403);
+assert.equal((await call('/api/enquiries','GET',null,st)).status,200);assert.equal((await call('/api/content','PUT',content,st)).status,403);
+const me=(await(await call('/api/users','GET',null,cookie)).json()).find(u=>u.username==='admin');assert.equal((await call('/api/users/'+me.id,'DELETE',null,cookie)).status,400);assert.equal((await call('/api/users/'+me.id,'PATCH',{role:'editor'},cookie)).status,400);
+assert.equal((await call('/api/login','POST',{username:'admin',password:'nope'})).status,401);
+const log=await(await call('/api/audit','GET',null,cookie)).json();assert.ok(['login','login_failed','user_create','content_update'].every(a=>log.items.some(e=>e.action===a)));assert.ok(!JSON.stringify(log).includes('test-only-password'));
+await stop();await start();const logged=await call('/api/login','POST',{username:'admin',password:'test-only-password'}),newCookie=logged.headers.get('set-cookie').split(';')[0];
 assert.equal((await(await call('/api/content')).json()).heroTitle,content.heroTitle);enquiries=await(await call('/api/enquiries','GET',null,newCookie)).json();assert.equal(enquiries.length,3);assert.equal(enquiries[0].status,'Dihubungi');
 assert.equal((await call('/api/logout','POST',{},newCookie)).status,200);assert.equal((await call('/api/enquiries','GET',null,newCookie)).status,401);
 });
