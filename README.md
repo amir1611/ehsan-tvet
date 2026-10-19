@@ -43,3 +43,5 @@ Both full-certificate PDFs list one month in one section and twelve months in an
 ## Deployment
 
 Run one Node process behind an HTTPS reverse proxy to localhost:4180. Set `NODE_ENV=production` for secure cookies. Keep `DATA_DIR` on a private persistent volume, restrict access and back it up. This file-backed app is for a single instance; use a transactional database before scaling to multiple processes. The included project has not been deployed publicly or connected to the existing property admin database.
+
+The Vercel deployment serves the public landing page from `public/`, including a versioned `content.json` catalogue. It deliberately keeps the file-backed admin and enquiry inbox local: Vercel Functions do not provide durable local-file storage. Connect a database before hosting those editing and enquiry features on Vercel.

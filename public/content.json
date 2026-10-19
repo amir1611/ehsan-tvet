@@ -1,0 +1,163 @@
+{
+  "heroTitle": "Kemahiran hari ini.\nKejayaan masa depan.",
+  "heroText": "Langkah pertama ke arah kerjaya berkemahiran bermula di sini. Bina keyakinan dan kuasai kemahiran elektrik bersama Ehsan TVET Institute.",
+  "phone": "0123309016",
+  "email": "nur.atika@rise.edu.my",
+  "address": "Lot 1155, GRN 24726, Mukim Si Rusa, 71009 Port Dickson, Negeri Sembilan",
+  "courses": [
+    {
+      "id": "satu-fasa",
+      "title": "Pemasangan & Penyelenggaraan Elektrik Satu Fasa",
+      "level": "SKM Tahap 2",
+      "category": "Sijil Penuh",
+      "code": "F432-005-2:2019",
+      "fee": "RM 9,375",
+      "duration": "Hubungi penyelaras",
+      "description": "Kuasai asas pendawaian domestik, pemasangan dan pembaikan sistem elektrik melalui latihan praktikal.",
+      "requirements": "Warganegara Malaysia, umur 15–45 tahun. Boleh membaca, menulis dan mengira; sihat tubuh badan dan tidak rabun warna.",
+      "image": "813546528_122110983411465506_6516183990178022625_n.jpg",
+      "pdf": "PEMASANGAN DAN PENYELENGGARAAN ELEKTRIK SATU FASA.pdf"
+    },
+    {
+      "id": "tiga-fasa",
+      "title": "Pemasangan & Penyelenggaraan Elektrik Tiga Fasa",
+      "level": "SKM Tahap 3",
+      "category": "Sijil Penuh",
+      "code": "F432-005-3:2019",
+      "fee": "RM 10,375",
+      "duration": "Hubungi penyelaras",
+      "description": "Tingkatkan kemahiran dalam sistem elektrik industri, kawalan mesin dan penyelenggaraan tiga fasa.",
+      "requirements": "Warganegara Malaysia, umur 16–35 tahun. Mempunyai SKM Tahap 2 dalam bidang elektrikal; sihat tubuh badan dan tidak rabun warna.",
+      "image": "812064823_122110983945465506_613335284846218575_n.jpg",
+      "pdf": "PEMASANGAN DAN PENYELENGGARAAN ELEKTRIK TIGA FASA.pdf"
+    },
+    {
+      "id": "mikro",
+      "title": "Pemasangan Pendawaian Elektrik Satu Fasa",
+      "level": "Micro Credential",
+      "category": "Kursus Pendek",
+      "code": "MCU-12",
+      "fee": "Rujuk institusi",
+      "duration": "Hubungi penyelaras",
+      "description": "Tambah kemahiran khusus dalam pendawaian elektrik satu fasa dengan pembelajaran yang berfokus.",
+      "requirements": "Hubungi penyelaras untuk maklumat pengambilan dan syarat terkini.",
+      "image": "813546528_122110983411465506_6516183990178022625_n.jpg",
+      "pdf": "PEMASANGAN PENDAWAIAN ELEKTRIK SATU FASA.pdf"
+    }
+  ],
+  "site": {
+    "announcement": {
+      "text": "MASA DEPAN BERMULA DENGAN SATU LANGKAH",
+      "link": "Terokai pengambilan kami"
+    },
+    "hero": {
+      "eyebrow": "EHSAN TVET INSTITUTE · PORT DICKSON",
+      "cta": "Terokai Program",
+      "image": "813546528_122110983411465506_6516183990178022625_n.jpg",
+      "photoLabel": "PRAKTIKAL HARI INI.\nPROFESIONAL ESOK.",
+      "captionKicker": "01 / LATIHAN AMALI",
+      "captionTitle": "Bukan sekadar teori.\nIni kemahiran sebenar.",
+      "noteTitle": "Sedia untuk industri",
+      "noteText": "Ilmu yang boleh dipraktikkan.",
+      "footLine1": "Pembelajaran sebenar.",
+      "footLine2": "Kemahiran untuk dunia pekerjaan."
+    },
+    "strip": [
+      {
+        "title": "Latihan Berasaskan Amali"
+      },
+      {
+        "title": "Laluan Sijil Kemahiran Malaysia"
+      },
+      {
+        "title": "Fokus Kemahiran Industri"
+      },
+      {
+        "title": "Port Dickson, Negeri Sembilan"
+      }
+    ],
+    "programs": {
+      "eyebrow": "PROGRAM PILIHAN ANDA",
+      "heading": "Cari kemahiran.\nCipta peluang.",
+      "intro": "Dari langkah pertama hingga kemahiran lanjutan,\npilih laluan yang sesuai dengan cita-cita anda.",
+      "note": "Maklumat yuran tertakluk kepada pengesahan institusi. Hubungi penyelaras untuk tempoh dan pengambilan terkini."
+    },
+    "about": {
+      "image": "812064823_122110983945465506_613335284846218575_n.jpg",
+      "photoTag": "ILMU + KEMAHIRAN + PENGALAMAN",
+      "eyebrow": "KENAPA EHSAN TVET?",
+      "heading": "Potensi anda.\nKomitmen kami.",
+      "text": "Kami percaya setiap individu berhak membina masa depan yang lebih baik. Di Ehsan TVET, pembelajaran melangkaui bilik darjah — memberi anda ruang untuk mencuba, berlatih dan berkembang.",
+      "reasons": [
+        {
+          "title": "Belajar dengan melakukan",
+          "text": "Latihan praktikal untuk membina keyakinan dan kemahiran teknikal."
+        },
+        {
+          "title": "Kemahiran yang membuka peluang",
+          "text": "Terokai laluan kerjaya sebagai juruteknik, kontraktor atau penjaga jentera elektrik."
+        },
+        {
+          "title": "Bimbingan pada setiap langkah",
+          "text": "Dapatkan panduan memilih program yang bersesuaian dengan kelayakan anda."
+        }
+      ]
+    },
+    "campus": {
+      "eyebrow": "LEBIH DEKAT DENGAN KAMI",
+      "heading": "Di sinilah semuanya bermula.",
+      "videoLink": "Tonton video kampus ↗",
+      "figures": [
+        {
+          "image": "793678098_18090892553235229_5871168263622142079_n.jpeg",
+          "kicker": "RUANG UNTUK BERKEMBANG",
+          "title": "Kampus Ehsan TVET"
+        },
+        {
+          "image": "801354608_18091341869235229_1590218568451667943_n.jpg",
+          "kicker": "KOMUNITI KAMI",
+          "title": "Langkah pertama, bersama-sama."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "ADA PERTANYAAN?",
+      "heading": "Kami sedia\nmembantu.",
+      "intro": "Segala yang anda ingin tahu\nsebelum memulakan perjalanan.",
+      "link": "Berbual dengan penyelaras ↗",
+      "items": [
+        {
+          "q": "Apakah syarat kelayakan untuk memohon?",
+          "a": "Program Satu Fasa terbuka kepada warganegara Malaysia berumur 15–45 tahun. Program Tiga Fasa memerlukan SKM Tahap 2 dalam bidang elektrikal dan umur 16–35 tahun. Lihat butiran program untuk syarat tambahan."
+        },
+        {
+          "q": "Adakah saya memerlukan pengalaman dalam elektrik?",
+          "a": "Program Satu Fasa sesuai untuk mereka yang ingin membina asas kemahiran elektrik. Anda perlu boleh membaca, menulis dan mengira. Program Tiga Fasa memerlukan kelayakan SKM Tahap 2."
+        },
+        {
+          "q": "Berapa lama tempoh pengajian?",
+          "a": "Tempoh bergantung pada program dan pengambilan. Hubungi penyelaras untuk pengesahan tempoh terkini sebelum memohon."
+        },
+        {
+          "q": "Di manakah lokasi Ehsan TVET Institute?",
+          "a": "{address}"
+        },
+        {
+          "q": "Bagaimanakah cara untuk memohon?",
+          "a": "Isi borang pertanyaan di bawah atau hubungi penyelaras melalui WhatsApp. Pasukan kami akan membantu anda menyemak kelayakan dan proses permohonan."
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "LANGKAH PERTAMA ANDA",
+      "heading": "Masa depan\ntak perlu tunggu.\nMulakan hari ini.",
+      "intro": "Tinggalkan maklumat anda. Kami akan membantu anda mencari program yang sesuai.",
+      "whatsapp": "Hubungi melalui WhatsApp ↗",
+      "formTitle": "Jom, bina masa depan anda."
+    },
+    "footer": {
+      "tagline": "Ilmu. Kemahiran. Pengalaman. Kerjaya.",
+      "copyright": "© 2026 Ehsan TVET Institute."
+    }
+  }
+}
