@@ -87,19 +87,19 @@
       "photoTag": "ILMU + KEMAHIRAN + PENGALAMAN",
       "eyebrow": "KENAPA EHSAN TVET?",
       "heading": "Potensi anda.\nKomitmen kami.",
-      "text": "Kami percaya setiap individu berhak membina masa depan yang lebih baik. Di Ehsan TVET, pembelajaran melangkaui bilik darjah — memberi anda ruang untuk mencuba, berlatih dan berkembang.",
+      "text": "Setiap individu berhak membina masa depan yang lebih cerah. Di Ehsan TVET, kami menyediakan ruang untuk anda belajar secara praktikal, mengasah kemahiran dan berkembang dengan yakin.",
       "reasons": [
         {
-          "title": "Belajar dengan melakukan",
-          "text": "Latihan praktikal untuk membina keyakinan dan kemahiran teknikal."
+          "title": "Belajar melalui pengalaman",
+          "text": "Bina kemahiran teknikal dan keyakinan diri melalui latihan praktikal."
         },
         {
           "title": "Kemahiran yang membuka peluang",
           "text": "Terokai laluan kerjaya sebagai juruteknik, kontraktor atau penjaga jentera elektrik."
         },
         {
-          "title": "Bimbingan pada setiap langkah",
-          "text": "Dapatkan panduan memilih program yang bersesuaian dengan kelayakan anda."
+          "title": "Bimbingan untuk langkah pertama anda",
+          "text": "Dapatkan panduan memilih program yang sesuai dengan kelayakan dan matlamat kerjaya anda."
         }
       ]
     },
@@ -121,9 +121,9 @@
       ]
     },
     "faq": {
-      "eyebrow": "ADA PERTANYAAN?",
-      "heading": "Kami sedia\nmembantu.",
-      "intro": "Segala yang anda ingin tahu\nsebelum memulakan perjalanan.",
+      "eyebrow": "Ada pertanyaan?",
+      "heading": "Kami sedia membantu.",
+      "intro": "Ketahui lebih lanjut tentang program, syarat kelayakan dan cara memohon.",
       "link": "Berbual dengan penyelaras ↗",
       "items": [
         {
@@ -150,8 +150,8 @@
     },
     "contact": {
       "eyebrow": "LANGKAH PERTAMA ANDA",
-      "heading": "Masa depan\ntak perlu tunggu.\nMulakan hari ini.",
-      "intro": "Tinggalkan maklumat anda. Kami akan membantu anda mencari program yang sesuai.",
+      "heading": "Masa depan bermula\ndengan langkah hari ini.",
+      "intro": "Tinggalkan maklumat anda dan kami akan membantu anda memilih program yang sesuai dengan minat dan kelayakan anda.",
       "whatsapp": "Hubungi melalui WhatsApp ↗",
       "formTitle": "Jom, bina masa depan anda."
     },
