@@ -23,8 +23,9 @@ if(!users&&storage){const bootstrap=JSON.parse(process.env.ADMIN_BOOTSTRAP||'nul
 if(!users){const legacy=process.env.ADMIN_PASSWORD?null:await read('credentials.json',null);let creds=legacy;if(!creds){const password=process.env.ADMIN_PASSWORD||randomBytes(12).toString('base64url');creds=await hashPassword(password);if(!process.env.ADMIN_PASSWORD)console.log('Initial admin password:',password)}
 users=[{id:randomBytes(8).toString('hex'),username:process.env.ADMIN_USERNAME||'admin',name:'Pentadbir',role:'admin',active:true,createdAt:new Date().toISOString(),lastLoginAt:null,...creds}];await save('users.json',users);console.log('Admin username:',users[0].username)}
 let auditLog=await read('audit.json',[]);
+const clientIP=req=>storage?storage.clientIP(req):(req.socket.remoteAddress||'');
 const publicUser=u=>({id:u.id,username:u.username,name:u.name,role:u.role,active:u.active,createdAt:u.createdAt,lastLoginAt:u.lastLoginAt});
-function audit(req,actor,action,target='',detail=''){auditLog.unshift({id:randomBytes(6).toString('hex'),at:new Date().toISOString(),userId:actor?.id||null,username:actor?.username||'—',role:actor?.role||'',action,target:String(target).slice(0,200),detail:String(detail).slice(0,1000),ip:req.socket.remoteAddress||''});if(auditLog.length>5000)auditLog.length=5000;return save('audit.json',auditLog)}
+function audit(req,actor,action,target='',detail=''){auditLog.unshift({id:randomBytes(6).toString('hex'),at:new Date().toISOString(),userId:actor?.id||null,username:actor?.username||'—',role:actor?.role||'',action,target:String(target).slice(0,200),detail:String(detail).slice(0,1000),ip:clientIP(req)});if(auditLog.length>5000)auditLog.length=5000;return save('audit.json',auditLog)}
 const sessions=new Map(await read('sessions.json',[]));
 if(storage)storage.sessions=sessions;
 const cleanup=!storage&&setInterval(()=>{for(const [key,s] of sessions)if(s.exp<=Date.now())sessions.delete(key)},60000);if(cleanup)cleanup.unref();
@@ -98,14 +99,14 @@ const me=path.startsWith('/api/')?current(req):null;
 if((path==='/api'||path.startsWith('/api/'))&&authorizeApi(req,res,path,me)!==true)return;
 if(path==='/api/content'&&req.method==='GET')return send(res,200,content);
 if(path==='/api/login'&&req.method==='POST'){
-if(!limit('login:'+req.socket.remoteAddress,10))return send(res,429,{error:'Terlalu banyak percubaan. Cuba lagi dalam 15 minit.'});
+if(!limit('login:'+clientIP(req),10))return send(res,429,{error:'Terlalu banyak percubaan. Cuba lagi dalam 15 minit.'});
 const {username,password}=await body(req);if(typeof username!=='string'||typeof password!=='string'||username.length>60||password.length>200)return send(res,400,{error:'Maklumat tidak sah.'});
 const user=users.find(u=>u.username===username.trim().toLowerCase()&&u.active&&validRole(u.role));const originalHash=user?.hash;if(!await checkPassword(user,password)||!users.includes(user)||!user.active||user.hash!==originalHash){await audit(req,null,'login_failed',username.trim().slice(0,60),'Nama pengguna atau kata laluan salah');return send(res,401,{error:'Nama pengguna atau kata laluan tidak sah.'})}
 const token=randomBytes(32).toString('hex');sessions.set(tokenDigest(token),{userId:user.id,exp:Date.now()+8*3600000});user.lastLoginAt=new Date().toISOString();await save('users.json',users);await audit(req,user,'login');return send(res,200,{ok:true,user:publicUser(user),can:ROLES[user.role]},{'Set-Cookie':`ehsan_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${process.env.NODE_ENV==='production'?'; Secure':''}`})}
 if(path==='/api/logout'&&req.method==='POST'){const u=current(req);if(u)await audit(req,u,'logout');sessions.delete(tokenOf(req));return send(res,200,{ok:true},{'Set-Cookie':'ehsan_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'})}
 if(path==='/api/session'&&req.method==='GET'){const u=current(req);return send(res,u?200:401,u?{authenticated:true,user:publicUser(u),can:ROLES[u.role]}:{authenticated:false})}
 if(path==='/api/enquiries'&&req.method==='POST'){
-if(!limit('enquiry:'+req.socket.remoteAddress,8))return send(res,429,{error:'Sila cuba lagi kemudian.'});
+if(!limit('enquiry:'+clientIP(req),8))return send(res,429,{error:'Sila cuba lagi kemudian.'});
 const b=await body(req);if(!validEnquiry(b))return send(res,400,{error:'Lengkapkan maklumat dan persetujuan anda.'});
 const item={id:randomBytes(8).toString('hex'),name:b.name,phone:b.phone,email:b.email,course:String(b.course||''),message:b.message||'',status:'Baharu',createdAt:new Date().toISOString(),consentAt:new Date().toISOString()};enquiries=[item,...enquiries];await save('enquiries.json',enquiries);return send(res,201,{ok:true});}
 if(path.startsWith('/api/')){

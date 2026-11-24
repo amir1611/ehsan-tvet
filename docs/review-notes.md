@@ -26,3 +26,11 @@ Scope: local source changes to the public website, admin interface, Node API, st
 ## Reproduction in an isolated environment
 
 Use a disposable checkout with dummy `DATA_DIR`, empty allowlisted environment, no external network, isolated loopback, read-only application/toolchain mounts, scratch-only writes and explicit limits. Run `node --test tests/security.test.mjs` and then `node --test tests/api.test.mjs`. The API suite now includes failed-patch atomicity, @ usernames, inherited-role rejection, object-shaped JSON, headers, conditional GET/HEAD and range response checks. These new cases still need isolated execution before calling this release fully verified. Do not expose real users.json, cloud tokens or home directories to the runner.
+
+## Production backend release, 24 November 2026
+
+Neon Postgres is connected to the Ehsan TVET production environment on its Free plan. The Node API now runs in a Vercel Function. CMS records, users, hashed session tokens, rate-limit counters, audit records and uploaded images persist in Postgres. Database transactions serialize requests across instances and commit state before sending successful responses. Local development retains its private file storage.
+
+Production checks passed for admin login and session persistence, staff access restrictions, user creation, password reset and session revocation, administrator deletion protection, removal of the temporary staff fixture, saving existing content, and logout. The local suite passes ten tests. This supersedes the earlier note about the production backend being unprovisioned. The earlier full-audit limitation still applies.
+
+Upload size is capped at 4 MB to fit Vercel's request limits. Public static programme HTML continues to be generated from the versioned publishing catalogue.

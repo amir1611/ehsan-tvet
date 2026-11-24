@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {createApplication} from './server.mjs';
 
 let pool;
+let schemaReady=false;
 function database() {
   if (!pool) {
     const url = new URL(process.env.DATABASE_URL || process.env.POSTGRES_URL);
@@ -40,15 +41,15 @@ export default async function production(req,res) {
   let client;
   try {
     client=await database().connect();
-    await client.query('BEGIN');
-    await client.query("SET LOCAL lock_timeout = '15s'");
-    await client.query("SET LOCAL statement_timeout = '20s'");
     // A transaction lock serializes this small CMS across serverless instances.
-    await client.query('SELECT pg_advisory_xact_lock(41804180)');
-    await client.query(`CREATE TABLE IF NOT EXISTS ehsan_state (
+    await client.query(`BEGIN;
+      SET LOCAL lock_timeout = '15s';
+      SET LOCAL statement_timeout = '20s';
+      SELECT pg_advisory_xact_lock(41804180)`);
+    if(!schemaReady)await client.query(`CREATE TABLE IF NOT EXISTS ehsan_state (
       id integer PRIMARY KEY CHECK (id=1), payload jsonb NOT NULL
     )`);
-    await client.query(`CREATE TABLE IF NOT EXISTS ehsan_images (
+    if(!schemaReady)await client.query(`CREATE TABLE IF NOT EXISTS ehsan_images (
       name text PRIMARY KEY, type text NOT NULL, body bytea NOT NULL
     )`);
     const result=await client.query('SELECT payload FROM ehsan_state WHERE id=1 FOR UPDATE');
@@ -58,6 +59,10 @@ export default async function production(req,res) {
     const buckets=documents['limits.json'] || {};
     for(const [key,value] of Object.entries(buckets))if(value.expires<=now)delete buckets[key];
     const storage={
+      clientIP(req) {
+        // Vercel overwrites this header at its trusted edge.
+        return String(req.headers['x-vercel-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+      },
       async read(name,fallback) {
         return documents[name] ?? (name==='content.json'?baseline:structuredClone(fallback));
       },
@@ -88,6 +93,7 @@ export default async function production(req,res) {
     await client.query(`INSERT INTO ehsan_state(id,payload) VALUES (1,$1)
       ON CONFLICT(id) DO UPDATE SET payload=EXCLUDED.payload`,[JSON.stringify(documents)]);
     await client.query('COMMIT');
+    schemaReady=true;
     response.flush(res);
   } catch(error) {
     if(client)await client.query('ROLLBACK').catch(()=>{});
