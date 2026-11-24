@@ -34,7 +34,7 @@ const revoke=(userId,except)=>{for(const [t,s] of sessions)if(s.userId===userId&
 const current=req=>{const t=tokenOf(req),s=t&&sessions.get(t);if(!s||s.exp<=Date.now())return null;const u=users.find(x=>x.id===s.userId);return u?.active?u:null};
 const can=(u,perm)=>!!u&&validRole(u.role)&&ROLES[u.role].includes(perm);
 const send=(res,status,value,headers={})=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',...headers});res.end(JSON.stringify(value))};
-async function rawBody(req,max){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>max)throw Error('Fail terlalu besar');chunks.push(chunk)}return Buffer.concat(chunks)}
+async function rawBody(req,max){if(Buffer.isBuffer(req.body)){if(req.body.length>max)throw Error('Fail terlalu besar');return req.body}const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>max)throw Error('Fail terlalu besar');chunks.push(chunk)}return Buffer.concat(chunks)}
 const imageType=b=>b[0]===0xff&&b[1]===0xd8&&b[2]===0xff?'jpg':b.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))?'png':b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP'?'webp':null;
 const body=jsonBody,limit=storage?storage.limit:rateLimiter();
 const fields=['heroTitle','heroText','phone','email','address'];

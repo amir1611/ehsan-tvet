@@ -25,6 +25,16 @@ export async function checkPassword(user,password) {
   return expected.length===actual.length && timingSafeEqual(actual,expected) && !!user;
 }
 export async function jsonBody(req,max=400000) {
+  // Vercel consumes the incoming stream and exposes the parsed payload here.
+  if (req.body !== undefined) {
+    const value = req.body;
+    const encoded = JSON.stringify(value);
+    if (Buffer.byteLength(encoded || '') > max || Number(req.headers?.['content-length']) > max) {
+      const error = Error('Permintaan terlalu besar'); error.status = 413; throw error;
+    }
+    if (!isObject(value)) throw Error('Objek JSON diperlukan');
+    return value;
+  }
   const chunks=[];let size=0;
   for await(const chunk of req){size+=chunk.length;if(size>max){const e=Error('Permintaan terlalu besar');e.status=413;throw e}chunks.push(chunk)}
   const value=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');
