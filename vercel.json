@@ -42,7 +42,7 @@
     }
   ],
   "functions": {
-    "api/[...path].mjs": {
+    "api/handler.mjs": {
       "maxDuration": 60,
       "includeFiles": "public/content.json",
       "excludeFiles": "{data/**,tests/**,.env*,public/assets/**}"
@@ -51,7 +51,11 @@
   "rewrites": [
     {
       "source": "/assets/:name([a-f0-9]{24}\\.(?:jpg|png|webp))",
-      "destination": "/api/media/:name"
+      "destination": "/api/handler?__route=media/:name"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/handler?__route=:path*"
     }
   ]
 }

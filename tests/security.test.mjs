@@ -39,3 +39,11 @@ test('video ranges support seeking and reject invalid bounds',()=>{
   assert.equal(byteRange('bytes=-0',100),false);
   assert.equal(byteRange(undefined,100),null);
 });
+
+test('Vercel parsed JSON payloads retain object and byte-size validation',async()=>{
+  const value={username:'fixture',password:'fixture-password'};
+  assert.deepEqual(await jsonBody({body:value,headers:{}}),value);
+  await assert.rejects(()=>jsonBody({body:null,headers:{}}));
+  await assert.rejects(()=>jsonBody({body:[],headers:{}}));
+  await assert.rejects(()=>jsonBody({body:{text:'x'.repeat(100)},headers:{}},20),{status:413});
+});
