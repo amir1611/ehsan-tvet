@@ -109,18 +109,25 @@
                     ↗</button>
             </div>
             <div class="campus-grid">
-                <figure><img data-img="site.campus.figures.0.image"
+                <figure><button type="button" class="campus-image" aria-label="Besarkan imej"><img data-img="site.campus.figures.0.image"
                         src="/assets/793678098_18090892553235229_5871168263622142079_n.jpeg"
-                        alt="Kemudahan Ehsan TVET Institute" width="1440" height="1440" loading="lazy" decoding="async">
+                        alt="Kemudahan Ehsan TVET Institute" width="1440" height="1440" loading="lazy" decoding="async"></button>
                     <figcaption><span data-t="site.campus.figures.0.kicker">RUANG UNTUK BERKEMBANG</span>
                         <h3 data-t="site.campus.figures.0.title">Kampus Ehsan TVET</h3>
                     </figcaption>
                 </figure>
-                <figure><img data-img="site.campus.figures.1.image"
+                <figure><button type="button" class="campus-image" aria-label="Besarkan imej"><img data-img="site.campus.figures.1.image"
                         src="/assets/801354608_18091341869235229_1590218568451667943_n.jpg"
-                        alt="Pertemuan bersama pelatih baharu Ehsan TVET" width="1254" height="1254" loading="lazy" decoding="async">
+                        alt="Pertemuan bersama pelatih baharu Ehsan TVET" width="1254" height="1254" loading="lazy" decoding="async"></button>
                     <figcaption><span data-t="site.campus.figures.1.kicker">KOMUNITI KAMI</span>
                         <h3 data-t="site.campus.figures.1.title">Langkah pertama, bersama-sama.</h3>
+                    </figcaption>
+                </figure>
+                <figure><button type="button" class="campus-image" aria-label="Besarkan imej"><img data-img="site.campus.figures.2.image"
+                        src="/assets/pengambilan-januari-2027.png"
+                        alt="Poster pengambilan baharu Ehsan TVET Januari 2027" width="2048" height="2048" loading="lazy" decoding="async"></button>
+                    <figcaption><span data-t="site.campus.figures.2.kicker">PENGAMBILAN BAHARU</span>
+                        <h3 data-t="site.campus.figures.2.title">Mulakan langkah pada Januari 2027.</h3>
                     </figcaption>
                 </figure>
             </div>
@@ -163,7 +170,7 @@
             <div class="contact-info">
                 <div class="contact-details">
                     <div><small>TELEFON</small><a id="phone" href="tel:+60123309016">0123309016</a>
-                        <a id="whatsapp" class="button lime" href="https://wa.me/60123309016" data-t="site.contact.whatsapp">Hubungi melalui WhatsApp ↗</a>
+                        <a id="whatsapp" class="button lime" href="https://wa.me/60123309016" data-t="site.contact.whatsapp">Hubungi melalui WhatsApp</a>
                     </div>
                     <div><small>E-MEL</small><a id="email" href="mailto:nur.atika@rise.edu.my">nur.atika@rise.edu.my</a></div>
                     <div class="contact-location"><small>KUNJUNGI KAMPUS</small><p id="address">Lot 1155, GRN 24726, Mukim Si Rusa, 71009 Port Dickson, Negeri Sembilan</p></div>
@@ -199,6 +206,10 @@
     </footer>
     <div class="mobile-dock"><a href="#program">Lihat Program <span>↗</span></a><a href="#hubungi">Saya Berminat
             <span>↗</span></a></div>
+    <dialog id="image-dialog" aria-label="Paparan imej kampus">
+        <button class="close" aria-label="Tutup imej">×</button>
+        <img id="expanded-image" alt="">
+    </dialog>
     <dialog id="course-dialog" aria-labelledby="detail-title"><button class="close" aria-label="Tutup">×</button>
         <div id="course-detail"></div>
     </dialog>

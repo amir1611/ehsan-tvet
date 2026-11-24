@@ -54,7 +54,7 @@ const SECTIONS=[
 {id:'strip',label:'Benefits',anchor:'.benefit-strip',fields:rep(4,i=>[T(`site.strip.${i}.title`,`Benefit ${i+1}`)])},
 {id:'programs',label:'Programmes',anchor:'#program',note:'Manage programme cards under Programmes & courses.',fields:[T('site.programs.eyebrow','Text above heading'),A('site.programs.heading','Section heading',ACCENT),A('site.programs.intro','Introduction',LINES),A('site.programs.note','Note below programme list')]},
 {id:'about',label:'About us',anchor:'#tentang',fields:[I('site.about.image','Image'),T('site.about.photoTag','Image tag'),T('site.about.eyebrow','Text above heading'),A('site.about.heading','Section heading',ACCENT),A('site.about.text','Introduction'),...rep(3,i=>[G(`Reason ${i+1}`),T(`site.about.reasons.${i}.title`,'Heading'),A(`site.about.reasons.${i}.text`,'Description')])]},
-{id:'campus',label:'Campus',anchor:'#kampus',fields:[T('site.campus.eyebrow','Text above heading'),A('site.campus.heading','Section heading'),T('site.campus.videoLink','Video link label'),...rep(2,i=>[G(`Photo ${i+1}`),I(`site.campus.figures.${i}.image`,'Image'),T(`site.campus.figures.${i}.kicker`,'Label'),T(`site.campus.figures.${i}.title`,'Heading')])]},
+{id:'campus',label:'Campus',anchor:'#kampus',fields:[T('site.campus.eyebrow','Text above heading'),A('site.campus.heading','Section heading'),T('site.campus.videoLink','Video link label'),...rep(3,i=>[G(`Photo ${i+1}`),I(`site.campus.figures.${i}.image`,'Image'),T(`site.campus.figures.${i}.kicker`,'Label'),T(`site.campus.figures.${i}.title`,'Heading')])]},
 {id:'faq',label:'FAQ',anchor:'#soalan',fields:[T('site.faq.eyebrow','Text above heading'),A('site.faq.heading','Section heading',LINES),A('site.faq.intro','Introduction',LINES),T('site.faq.link','Link text'),...rep(5,i=>[G(`Question ${i+1}`),T(`site.faq.items.${i}.q`,'Question'),A(`site.faq.items.${i}.a`,'Answer',i===3?'{address} displays the institute address from the Contact tab.':undefined)])]},
 {id:'contact',label:'Contact',anchor:'#hubungi',fields:[T('site.contact.eyebrow','Text above heading'),A('site.contact.heading','Section heading','The third line uses the accent colour.'),A('site.contact.intro','Introduction'),T('site.contact.whatsapp','WhatsApp button label'),T('site.contact.formTitle','Form heading'),G('Contact details'),T('phone','Phone / WhatsApp'),T('email','Coordinator email'),A('address','Institute address')]}
 ];
@@ -83,8 +83,9 @@ const dt=iso=>new Date(iso).toLocaleString('en-MY',{dateStyle:'medium',timeStyle
 const ICON={edit:icon('pencil'),trash:icon('trash-2')};
 async function renderUsers(){const el=$('#admin-content');try{users=await api('users')}catch(e){el.innerHTML=`<div class="admin-card"><p class="error">${esc(e.message)}</p></div>`;return}
 if(userView.mode==='form')return renderUserForm();
-el.innerHTML=`<div class="admin-card"><div class="admin-actions"><div><h2>Users</h2><p class="admin-help-inline">${users.length} accounts · access depends on role</p></div><button id="add-user" class="button">+ Add user</button></div><div class="role-legend">${Object.keys(ROLE_LABEL).map(r=>`<div><span class="badge role-${r}">${ROLE_LABEL[r]}</span><p>${ROLE_DESC[r]}</p></div>`).join('')}</div><div class="table-scroll"><table class="admin-table"><thead><tr><th>USER</th><th>ROLE</th><th>STATUS</th><th>LAST SIGN-IN</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td><strong>${esc(u.name)}</strong>${u.id===me.id?' <span class="badge">You</span>':''}<p>@${esc(u.username)}</p></td><td><span class="badge role-${u.role}">${ROLE_LABEL[u.role]}</span></td><td><span class="badge ${u.active?'ok':'bad'}">${u.active?'Active':'Inactive'}</span></td><td>${u.lastLoginAt?dt(u.lastLoginAt):'Never'}</td><td class="row-actions"><button class="icon-btn" data-uedit="${u.id}" aria-label="Edit ${esc(u.name)}" title="Edit">${ICON.edit}</button>${u.id===me.id?'':`<button class="icon-btn danger" data-udel="${u.id}" aria-label="Delete ${esc(u.name)}" title="Delete">${ICON.trash}</button>`}</td></tr>`).join('')}</tbody></table></div></div>`;
+el.innerHTML=`<div class="admin-card"><div class="admin-actions"><div><h2>Users</h2><p class="admin-help-inline">${users.length} accounts · access depends on role</p></div><button id="add-user" class="button">+ Add user</button></div><div class="role-legend">${Object.keys(ROLE_LABEL).map(r=>`<div><span class="badge role-${r}">${ROLE_LABEL[r]}</span><p>${ROLE_DESC[r]}</p></div>`).join('')}</div><div class="table-scroll"><table class="admin-table"><thead><tr><th>USER</th><th>ROLE</th><th>STATUS</th><th>LAST SIGN-IN</th><th class="actions-heading">ACTIONS</th></tr></thead><tbody>${users.map(u=>`<tr><td><strong>${esc(u.name)}</strong>${u.id===me.id?' <span class="badge">You</span>':''}<p>@${esc(u.username)}</p></td><td><span class="badge role-${u.role}">${ROLE_LABEL[u.role]}</span></td><td><span class="badge ${u.active?'ok':'bad'}">${u.active?'Active':'Inactive'}</span></td><td>${u.lastLoginAt?dt(u.lastLoginAt):'Never'}</td><td class="row-actions"><button class="icon-btn" data-uedit="${u.id}" aria-label="Edit ${esc(u.name)}" title="Edit">${ICON.edit}</button><button class="icon-btn" data-reset="${u.id}" aria-label="Reset password for ${esc(u.name)}" title="Reset password">${icon('key-round')}</button>${u.role==='admin'?'':`<button class="icon-btn danger" data-udel="${u.id}" aria-label="Delete ${esc(u.name)}" title="Delete">${ICON.trash}</button>`}</td></tr>`).join('')}</tbody></table></div></div>`;
 $('#add-user').onclick=()=>{userView={mode:'form',id:null};renderUsers()};
+el.querySelectorAll('[data-reset]').forEach(button=>button.onclick=()=>resetUserPassword(users.find(user=>user.id===button.dataset.reset)));
 el.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>{userView={mode:'form',id:b.dataset.uedit};renderUsers()});
 el.querySelectorAll('[data-udel]').forEach(b=>b.onclick=async()=>{const u=users.find(x=>x.id===b.dataset.udel);if(!confirm(`Delete user “${u.name}” (@${u.username})? This action cannot be undone.`))return;try{await api('users/'+u.id,{method:'DELETE'});status('User deleted.');renderUsers()}catch(e){status(e.message,true)}})}
 function renderUserForm(){const u=userView.id?users.find(x=>x.id===userView.id):null,self=u?.id===me.id;
@@ -102,3 +103,37 @@ const q=$('#audit-q');q.onkeydown=e=>{if(e.key==='Enter'){auditState={...auditSt
 function renderAccount(){$('#admin-content').innerHTML=`<div class="admin-card"><h2>My account</h2><dl class="review account-info"><dt>Name</dt><dd>${esc(me.name)}</dd><dt>Username</dt><dd>@${esc(me.username)}</dd><dt>Role</dt><dd><span class="badge role-${me.role}">${ROLE_LABEL[me.role]}</span> ${ROLE_DESC[me.role]}</dd></dl><h3 class="field-group">Change password</h3><form id="pw-form" novalidate><label>Current password<input type="password" name="current" autocomplete="current-password" required></label><div class="form-row"><label>New password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label><label>Confirm new password<input type="password" name="confirm" autocomplete="new-password" required></label></div><small class="field-hint">Use at least 8 characters. Your other sessions will be signed out.</small><div class="wizard-nav"><span></span><button class="button" type="submit">Change password ↗</button></div></form></div>`;
 $('#pw-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=Object.fromEntries(new FormData(f));if(d.password.length<8){status('Use at least 8 characters for the new password.',true);return}if(d.password!==d.confirm){status('The passwords do not match.',true);return}const b=f.querySelector('button[type=submit]');b.disabled=true;try{await api('me/password',{method:'PATCH',body:JSON.stringify({current:d.current,password:d.password})});f.reset();status('Password changed.')}catch(err){status(err.message,true)}finally{b.disabled=false}}}
 try{await init()}catch{}
+
+function resetUserPassword(user) {
+  const dialog = document.createElement('dialog');
+  dialog.className = 'reset-password-dialog admin-card';
+  dialog.setAttribute('aria-labelledby', 'reset-password-title');
+  dialog.innerHTML = `<h2 id="reset-password-title">Reset password</h2>
+    <p>Set a new password for ${esc(user.name)} (@${esc(user.username)}). Their other sessions will be signed out.</p>
+    <form><label>New password<input type="password" name="password" required minlength="8" maxlength="200" autocomplete="new-password"></label>
+    <label>Confirm new password<input type="password" name="confirmation" required minlength="8" maxlength="200" autocomplete="new-password"></label>
+    <p class="reset-status" role="status"></p>
+    <div class="reset-actions"><button type="button" class="button ghost" data-cancel>Cancel</button><button type="submit" class="button">Reset password</button></div></form>`;
+  document.body.append(dialog);
+  dialog.querySelector('[data-cancel]').onclick=()=>dialog.close();
+  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  dialog.querySelector('form').onsubmit=async event=>{
+    event.preventDefault();
+    const form=event.currentTarget;
+    const message=dialog.querySelector('.reset-status');
+    if(form.elements.password.value!==form.elements.confirmation.value){
+      message.textContent='The passwords do not match.';
+      return;
+    }
+    const submit=form.querySelector('[type=submit]');
+    submit.disabled=true;
+    try{
+      await api('users/'+user.id,{method:'PATCH',body:JSON.stringify({password:form.elements.password.value})});
+      dialog.close();
+      status('Password reset for '+user.name+'.');
+    }catch(error){
+      message.textContent=error.message;
+    }finally{submit.disabled=false}
+  };
+  dialog.showModal();
+}

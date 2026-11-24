@@ -85,3 +85,13 @@
   .admin-card select option:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; }
   .admin-card select option::checkmark { order: 1; margin-inline-start: auto; color: var(--navy); }
 }
+
+.admin-table td.row-actions{display:table-cell;vertical-align:middle;text-align:right;white-space:nowrap}
+.admin-table td.row-actions .icon-btn{display:inline-grid;vertical-align:middle;margin-left:6px}
+.admin-table .actions-heading{text-align:right}
+.reset-password-dialog{margin:auto;width:min(480px,calc(100vw - 32px));max-height:90dvh;overflow:auto;padding:28px}
+.reset-password-dialog::backdrop{background:#180807b3}
+.reset-password-dialog>p{margin-bottom:20px}
+.reset-password-dialog label{display:block;margin-top:16px}
+.reset-actions{display:flex;justify-content:flex-end;gap:12px}
+.reset-status{margin-top:12px;color:#a12b25}
