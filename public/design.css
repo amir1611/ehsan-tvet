@@ -157,6 +157,7 @@
 }
 
 /* Alternate content section backgrounds, starting with Programs. */
+.tvet-site .course-bottom>a{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:10px 14px;border-radius:30px;background:#f2ece4;font-size:11px;font-weight:600}
 @media(min-width:1100px){.tvet-site .hero{min-height:max(720px,calc(100svh - 92px))}}
 .tvet-site footer>div{border-top:0;padding-top:0;justify-content:center;text-align:center}
 @media(min-width:1100px){
@@ -183,3 +184,5 @@
 .tvet-site .programs,.tvet-site .campus,.tvet-site .contact{background:#fff}
 .tvet-site .about,.tvet-site .faq{background:#efe6dc}
 @media(max-width:599px){.tvet-site .benefit-strip{display:none}}
+
+.compare-programs { margin: 12px 0 20px; }

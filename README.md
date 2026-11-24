@@ -1,5 +1,9 @@
 # Ehsan TVET
 
+Local improvements dated 2026-11-24 are described in [docs/review-notes.md](docs/review-notes.md), [docs/seo-plan.md](docs/seo-plan.md) and [docs/security-skill-issues.md](docs/security-skill-issues.md). The latest runtime security/API tests require a working isolated environment before release; syntax validation alone is not a security certification.
+
+`npm run build` refreshes the public program pages, homepage catalogue/schema and sitemap from `public/content.json`. It does not publish private local CMS data automatically. The Vercel site remains static until its API and persistent storage are provisioned.
+
 Malay landing page and a working single-admin CMS, added to the supplied `admin-panel` branch. The original property website and its Next.js admin remain intact; this self-contained TVET app is in `tvet/` and does not depend on the property database.
 
 ## Run

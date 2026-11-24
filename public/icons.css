@@ -1,0 +1,22 @@
+/* Shared Lucide icon tokens for the landing page and admin. */
+:root{--icon-size:20px;--icon-stroke:1.8}
+.password-field{position:relative;display:block;margin-top:6px}
+.password-field>input{margin-top:0;padding-right:50px}
+.password-field>.password-toggle{position:absolute;right:2px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:44px;height:40px;min-height:0;padding:0;border:0;border-radius:6px;background:transparent;color:#746863;cursor:pointer}
+.password-field>.password-toggle:hover{background:#4a0a0809;color:#4a0a08}
+.password-field>.password-toggle:focus-visible{outline:2px solid #cb8920;outline-offset:0}
+.ui-icon{display:inline-block;width:var(--icon-size);height:var(--icon-size);flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;pointer-events:none}
+.button .ui-icon,.text-button .ui-icon{width:18px;height:18px}
+.admin-body aside button .ui-icon,.admin-body aside>a .ui-icon{width:18px;height:18px;margin-right:8px}
+.tvet-site .play .ui-icon{width:16px;height:16px}
+.tvet-site .small-seal .ui-icon{width:30px;height:30px}
+.tvet-site .close{display:grid;place-items:center}
+.tvet-site .close .ui-icon,.preview-close .ui-icon{width:24px;height:24px}
+.tvet-site .menu{padding:12px;align-items:center}
+.tvet-site .menu .ui-icon{width:22px;height:22px}
+.tvet-site .menu .menu-close{display:none}
+.tvet-site .menu[aria-expanded=true] .menu-open{display:none}
+.tvet-site .menu[aria-expanded=true] .menu-close{display:block}
+.tvet-site .faq summary:after{content:'';background:currentColor;mask:url('/assets/icons/plus.svg') center/18px 18px no-repeat;border:0}
+.tvet-site .faq details[open] summary:after{content:'';background:currentColor;color:var(--burgundy);mask-image:url('/assets/icons/minus.svg');transform:none}
+@media(max-width:1099px){.tvet-site nav a:after{content:'';display:block;width:18px;height:18px;background:var(--gold);mask:url('/assets/icons/arrow-up-right.svg') center/contain no-repeat}}

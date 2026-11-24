@@ -1,0 +1,9 @@
+.program-page{max-width:1120px;margin:0 auto;padding:32px 24px 64px}.program-page nav{position:static;display:flex;flex-wrap:wrap;margin:0 0 32px;padding:0;gap:16px;background:none;box-shadow:none}.program-page h1{font-size:clamp(32px,5vw,56px);line-height:1.15;letter-spacing:-1.5px;margin:18px 0 24px}.program-intro{max-width:760px;font-size:18px}.program-layout{display:grid;gap:32px;margin-top:32px}.program-poster{display:block;width:100%;height:auto;border-radius:12px}.program-page h2{font-size:26px;margin:24px 0 12px}.program-page p{margin-bottom:16px}.program-page dl{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:24px;background:#efe6dc;border-radius:12px}.program-page dd{margin:0;font-weight:600}.program-page .related{display:flex;flex-wrap:wrap;gap:16px;list-style:none;padding:0}.program-page .related a{text-decoration:underline}.program-page .button{margin:12px 0}.program-page footer{padding:32px 0 0;font-size:12px}@media(min-width:800px){.program-layout{grid-template-columns:1fr 1fr;align-items:start}}
+
+.compare-scroll { overflow-x: auto; margin: 24px 0 16px; }
+.compare-scroll table { border-collapse: collapse; width: 100%; min-width: 650px; }
+.compare-scroll th, .compare-scroll td { text-align: start; vertical-align: top; padding: 14px; border-bottom: 1px solid var(--line); }
+.compare-scroll thead { background: #efe6dc; }
+.compare-scroll small { display: block; color: var(--muted); margin-top: 4px; }
+.compare-scroll a, .compare-link { color: var(--navy); text-decoration: underline; }
+.compare-scroll caption { text-align: start; font-weight: 700; padding: 0 0 12px; }

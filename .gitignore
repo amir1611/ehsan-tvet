@@ -1,2 +1,7 @@
 data/*.json
 .env
+
+.env.*
+!.env.example
+data/uploads/
+.vercel/

@@ -8,3 +8,80 @@
 .row-actions{display:flex;gap:6px}.icon-btn{width:34px;height:34px;display:grid;place-items:center;background:none;border:1px solid var(--line);border-radius:6px;color:var(--navy);cursor:pointer;padding:0;transition:background .2s,border-color .2s}.icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.icon-btn:hover{background:#f7edda;border-color:var(--navy)}.icon-btn.danger{color:#a12b25}.icon-btn.danger:hover{background:#fbe9e7;border-color:#a12b25}
 
 .user-chip{display:flex;align-items:center;gap:12px}.user-meta{display:flex;flex-direction:column;align-items:flex-end;line-height:1.3}.user-meta b{font-size:12px;letter-spacing:0;color:var(--ink)}.user-meta small{font-size:10px;letter-spacing:.6px;color:var(--muted)}.sidebar-label-2{margin-top:14px}.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:20px;background:#efe6dc;color:var(--navy);white-space:nowrap}.badge.ok{background:#e2f1e2;color:#256b2c}.badge.bad{background:#fbe1de;color:#a12b25}.badge.warn{background:#f7edda;color:#855314}.badge.role-admin{background:var(--navy);color:white}.badge.role-editor{background:#f7edda;color:#855314}.badge.role-staff{background:#e0ebf7;color:#1f4d80}.role-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}.role-legend>div{border:1px solid var(--line);border-radius:8px;padding:12px}.role-legend p{font-size:12px;color:var(--muted);margin-top:8px}.check{display:flex;align-items:center;gap:10px}.check input{width:auto;margin:0}.nowrap{white-space:nowrap}.audit-filters{justify-content:flex-start}.audit-filters input{max-width:340px;margin:0}.audit-filters select{width:220px}.account-info{margin-bottom:10px}@media(max-width:850px){.role-legend{grid-template-columns:1fr}.user-meta{display:none}}
+
+.admin-card select {
+  max-width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background-color: white;
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.admin-card select:hover:enabled { border-color: #aa8e7c; }
+.admin-card select:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.admin-card select:disabled { opacity: .65; cursor: default; }
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .admin-card select,
+  .admin-card select::picker(select) { appearance: base-select; }
+
+  .admin-card select {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: start;
+  }
+
+  .admin-card select::picker-icon {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: none;
+    margin-inline-end: 3px;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-2px) rotate(45deg);
+  }
+  .admin-card select:open::picker-icon { transform: translateY(2px) rotate(225deg); }
+
+  .admin-card select::picker(select) {
+    box-sizing: border-box;
+    min-width: anchor-size(width);
+    max-height: min(22rem, 55dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin-block: 4px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    color: var(--ink);
+    box-shadow: 0 8px 24px #32191720;
+  }
+
+  .admin-card select option {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .admin-card select option:checked {
+    background: #f6ede0;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .admin-card select option:hover,
+  .admin-card select option:focus-visible { background: #efe6dc; }
+  .admin-card select option:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; }
+  .admin-card select option::checkmark { order: 1; margin-inline-start: auto; color: var(--navy); }
+}
