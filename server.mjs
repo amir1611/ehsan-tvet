@@ -3,36 +3,40 @@ import {readFile,writeFile,mkdir,rename,stat,realpath} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {resolve,extname,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {randomBytes} from 'node:crypto';
+import {randomBytes,createHash} from 'node:crypto';
 import {USERNAME,ROLES,validRole,isObject,hashPassword,checkPassword,jsonBody,validEnquiry,rateLimiter,contentSecurityPolicy,byteRange} from './security.mjs';
 import {initialContent,siteDefaults} from './seed.mjs';
+export async function createApplication(storage = null) {
 const root=dirname(fileURLToPath(import.meta.url)),publicRoot=resolve(root,'public'),data=process.env.DATA_DIR||resolve(root,'data');
-const uploads=resolve(data,'uploads');await mkdir(uploads,{recursive:true});
-const read=async(name,fallback)=>{try{return JSON.parse(await readFile(resolve(data,name),'utf8'))}catch(e){if(e.code==='ENOENT')return fallback;throw e}};
+const uploads=resolve(data,'uploads');if(!storage)await mkdir(uploads,{recursive:true});
+const read=async(name,fallback)=>{if(storage)return storage.read(name,fallback);try{return JSON.parse(await readFile(resolve(data,name),'utf8'))}catch(e){if(e.code==='ENOENT')return fallback;throw e}};
 const writes=new Map();
 // Fills missing keys from the defaults and rejects values of the wrong shape.
 function conform(d,v,key=''){if(typeof d==='string'){if(v===undefined)return d;if(typeof v!=='string'||v.length>5000||(key==='image'&&!/^[\w. -]*$/.test(v)))throw Error('site');return v}
 if(v!==undefined&&(v===null||typeof v!=='object'||Array.isArray(v)!==Array.isArray(d)))throw Error('site');
 if(Array.isArray(d))return d.map((x,i)=>conform(x,v?.[i]));return Object.fromEntries(Object.keys(d).map(k=>[k,conform(d[k],v?.[k],k)]))}
-const save=(name,value)=>{const snapshot=JSON.stringify(value,null,2),previous=writes.get(name)||Promise.resolve();const next=previous.catch(()=>{}).then(async()=>{const p=resolve(data,name),t=p+'.tmp';await writeFile(t,snapshot,{mode:0o600});await rename(t,p)});writes.set(name,next);return next};
+const save=(name,value)=>{if(storage)return storage.save(name,value);const snapshot=JSON.stringify(value,null,2),previous=writes.get(name)||Promise.resolve();const next=previous.catch(()=>{}).then(async()=>{const p=resolve(data,name),t=p+'.tmp';await writeFile(t,snapshot,{mode:0o600});await rename(t,p)});writes.set(name,next);return next};
 let content=await read('content.json',initialContent),enquiries=await read('enquiries.json',[]);
 content.site=conform(siteDefaults,content.site);
 let users=await read('users.json',null);
+if(!users&&storage){const bootstrap=JSON.parse(process.env.ADMIN_BOOTSTRAP||'null');if(!bootstrap||!USERNAME.test(bootstrap.username)||!bootstrap.salt?.match(/^[a-f0-9]{32}$/)||!bootstrap.hash?.match(/^[a-f0-9]{128}$/))throw Error('Admin bootstrap is missing');users=[{id:randomBytes(8).toString('hex'),name:'Admin',role:'admin',active:true,createdAt:new Date().toISOString(),lastLoginAt:null,username:bootstrap.username,salt:bootstrap.salt,hash:bootstrap.hash}];await save('users.json',users)}
 if(!users){const legacy=process.env.ADMIN_PASSWORD?null:await read('credentials.json',null);let creds=legacy;if(!creds){const password=process.env.ADMIN_PASSWORD||randomBytes(12).toString('base64url');creds=await hashPassword(password);if(!process.env.ADMIN_PASSWORD)console.log('Initial admin password:',password)}
 users=[{id:randomBytes(8).toString('hex'),username:process.env.ADMIN_USERNAME||'admin',name:'Pentadbir',role:'admin',active:true,createdAt:new Date().toISOString(),lastLoginAt:null,...creds}];await save('users.json',users);console.log('Admin username:',users[0].username)}
 let auditLog=await read('audit.json',[]);
 const publicUser=u=>({id:u.id,username:u.username,name:u.name,role:u.role,active:u.active,createdAt:u.createdAt,lastLoginAt:u.lastLoginAt});
 function audit(req,actor,action,target='',detail=''){auditLog.unshift({id:randomBytes(6).toString('hex'),at:new Date().toISOString(),userId:actor?.id||null,username:actor?.username||'—',role:actor?.role||'',action,target:String(target).slice(0,200),detail:String(detail).slice(0,1000),ip:req.socket.remoteAddress||''});if(auditLog.length>5000)auditLog.length=5000;return save('audit.json',auditLog)}
-const sessions=new Map();
-const cleanup=setInterval(()=>{for(const [key,s] of sessions)if(s.exp<=Date.now())sessions.delete(key)},60000);cleanup.unref();
-const tokenOf=req=>(req.headers.cookie||'').match(/(?:^|; )ehsan_session=([^;]+)/)?.[1];
+const sessions=new Map(await read('sessions.json',[]));
+if(storage)storage.sessions=sessions;
+const cleanup=!storage&&setInterval(()=>{for(const [key,s] of sessions)if(s.exp<=Date.now())sessions.delete(key)},60000);if(cleanup)cleanup.unref();
+const tokenDigest=token=>createHash('sha256').update(token).digest('hex');
+const tokenOf=req=>{const token=(req.headers.cookie||'').match(/(?:^|; )ehsan_session=([^;]+)/)?.[1];return token?tokenDigest(token):undefined};
 const revoke=(userId,except)=>{for(const [t,s] of sessions)if(s.userId===userId&&t!==except)sessions.delete(t)};
 const current=req=>{const t=tokenOf(req),s=t&&sessions.get(t);if(!s||s.exp<=Date.now())return null;const u=users.find(x=>x.id===s.userId);return u?.active?u:null};
 const can=(u,perm)=>!!u&&validRole(u.role)&&ROLES[u.role].includes(perm);
 const send=(res,status,value,headers={})=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store',...headers});res.end(JSON.stringify(value))};
 async function rawBody(req,max){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>max)throw Error('Fail terlalu besar');chunks.push(chunk)}return Buffer.concat(chunks)}
 const imageType=b=>b[0]===0xff&&b[1]===0xd8&&b[2]===0xff?'jpg':b.subarray(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))?'png':b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP'?'webp':null;
-const body=jsonBody,limit=rateLimiter();
+const body=jsonBody,limit=storage?storage.limit:rateLimiter();
 const fields=['heroTitle','heroText','phone','email','address'];
 function diffContent(a,b){const out=[],changed=[];for(const k of fields)if(a[k]!==b[k])changed.push(k);for(const k of Object.keys(siteDefaults))if(JSON.stringify(a.site?.[k])!==JSON.stringify(b.site[k]))changed.push('seksyen '+k);if(changed.length)out.push({action:'content_update',target:'Kandungan Laman',detail:'Diubah: '+changed.join(', ')});
 const old=new Map(a.courses.map(c=>[c.id,c])),seen=new Set();for(const c of b.courses){seen.add(c.id);const o=old.get(c.id);if(!o)out.push({action:'course_create',target:c.title,detail:`Kod ${c.code}`});else{const f=Object.keys(c).filter(k=>c[k]!==o[k]);if(f.length)out.push({action:'course_update',target:c.title,detail:'Diubah: '+f.join(', ')})}}
@@ -79,10 +83,17 @@ function authorizeApi(req,res,path,me) {
   }
   return true;
 }
-export const server=http.createServer(async(req,res)=>{try{
+return async function handleRequest(req,res){try{
 res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','SAMEORIGIN');
 res.setHeader('Content-Security-Policy',contentSecurityPolicy);res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
 const url=new URL(req.url,'http://localhost'),path=url.pathname;
+if(storage&&/^\/api\/media\/[a-f0-9]{24}\.(jpg|png|webp)$/.test(path)){
+  if(!['GET','HEAD'].includes(req.method))return send(res,405,{error:'Kaedah tidak dibenarkan'});
+  const image=await storage.readImage(path.split('/').pop());
+  if(!image)return send(res,404,{error:'Tidak ditemui'});
+  res.writeHead(200,{'Content-Type':image.type,'Content-Length':image.body.length,'Cache-Control':'public, max-age=31536000, immutable'});
+  return res.end(req.method==='HEAD'?undefined:image.body);
+}
 const me=path.startsWith('/api/')?current(req):null;
 if((path==='/api'||path.startsWith('/api/'))&&authorizeApi(req,res,path,me)!==true)return;
 if(path==='/api/content'&&req.method==='GET')return send(res,200,content);
@@ -90,7 +101,7 @@ if(path==='/api/login'&&req.method==='POST'){
 if(!limit('login:'+req.socket.remoteAddress,10))return send(res,429,{error:'Terlalu banyak percubaan. Cuba lagi dalam 15 minit.'});
 const {username,password}=await body(req);if(typeof username!=='string'||typeof password!=='string'||username.length>60||password.length>200)return send(res,400,{error:'Maklumat tidak sah.'});
 const user=users.find(u=>u.username===username.trim().toLowerCase()&&u.active&&validRole(u.role));const originalHash=user?.hash;if(!await checkPassword(user,password)||!users.includes(user)||!user.active||user.hash!==originalHash){await audit(req,null,'login_failed',username.trim().slice(0,60),'Nama pengguna atau kata laluan salah');return send(res,401,{error:'Nama pengguna atau kata laluan tidak sah.'})}
-const token=randomBytes(32).toString('hex');sessions.set(token,{userId:user.id,exp:Date.now()+8*3600000});user.lastLoginAt=new Date().toISOString();await save('users.json',users);await audit(req,user,'login');return send(res,200,{ok:true,user:publicUser(user),can:ROLES[user.role]},{'Set-Cookie':`ehsan_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${process.env.NODE_ENV==='production'?'; Secure':''}`})}
+const token=randomBytes(32).toString('hex');sessions.set(tokenDigest(token),{userId:user.id,exp:Date.now()+8*3600000});user.lastLoginAt=new Date().toISOString();await save('users.json',users);await audit(req,user,'login');return send(res,200,{ok:true,user:publicUser(user),can:ROLES[user.role]},{'Set-Cookie':`ehsan_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${process.env.NODE_ENV==='production'?'; Secure':''}`})}
 if(path==='/api/logout'&&req.method==='POST'){const u=current(req);if(u)await audit(req,u,'logout');sessions.delete(tokenOf(req));return send(res,200,{ok:true},{'Set-Cookie':'ehsan_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'})}
 if(path==='/api/session'&&req.method==='GET'){const u=current(req);return send(res,u?200:401,u?{authenticated:true,user:publicUser(u),can:ROLES[u.role]}:{authenticated:false})}
 if(path==='/api/enquiries'&&req.method==='POST'){
@@ -100,7 +111,7 @@ const item={id:randomBytes(8).toString('hex'),name:b.name,phone:b.phone,email:b.
 if(path.startsWith('/api/')){
 if(path==='/api/upload'&&req.method==='POST'){
 if(!limit('upload:'+me.id,30))return send(res,429,{error:'Terlalu banyak muat naik. Cuba lagi kemudian.'});
-let buf;try{buf=await rawBody(req,5*1024*1024)}catch{return send(res,413,{error:'Imej terlalu besar (maksimum 5MB).'})}const ext=imageType(buf);if(!ext)return send(res,400,{error:'Format imej tidak sah. Gunakan JPG, PNG atau WebP.'});const name=randomBytes(12).toString('hex')+'.'+ext;await writeFile(resolve(uploads,name),buf,{mode:0o600});await audit(req,me,'upload',name,`Imej dimuat naik (${Math.round(buf.length/1024)} KB)`);return send(res,201,{name})}
+let buf;try{buf=await rawBody(req,4*1024*1024)}catch{return send(res,413,{error:'Imej terlalu besar (maksimum 4MB).'})}const ext=imageType(buf);if(!ext)return send(res,400,{error:'Format imej tidak sah. Gunakan JPG, PNG atau WebP.'});const name=randomBytes(12).toString('hex')+'.'+ext;if(storage)await storage.saveImage(name,buf,ext);else await writeFile(resolve(uploads,name),buf,{mode:0o600});await audit(req,me,'upload',name,`Imej dimuat naik (${Math.round(buf.length/1024)} KB)`);return send(res,201,{name})}
 if(path==='/api/content'&&req.method==='PUT'){const b=await body(req);if(fields.some(k=>typeof b[k]!=='string'||!b[k].trim()||b[k].length>5000)||!Array.isArray(b.courses)||b.courses.length>30||b.courses.some(c=>!isObject(c)||['id','title','category','level','description','code','fee','duration','requirements','image','pdf'].some(k=>typeof c[k]!=='string'||c[k].length>5000)||!c.title.trim()||!c.id.match(/^[a-z0-9-]+$/)))return send(res,400,{error:'Kandungan tidak sah.'});try{b.site=conform(siteDefaults,b.site)}catch{return send(res,400,{error:'Kandungan laman tidak sah.'})}const next={...Object.fromEntries(fields.map(k=>[k,b[k]])),courses:b.courses,site:b.site};const events=diffContent(content,next);await save('content.json',next);content=next;for(const e of events)await audit(req,me,e.action,e.target,e.detail);return send(res,200,{ok:true})}
 if(path==='/api/enquiries'&&req.method==='GET')return send(res,200,enquiries);
 if(path.startsWith('/api/enquiries/')&&req.method==='PATCH'){const b=await body(req),item=enquiries.find(e=>e.id===path.split('/').pop());if(!item)return send(res,404,{error:'Tidak ditemui'});if(!['Baharu','Dihubungi','Selesai'].includes(b.status))return send(res,400,{error:'Status tidak sah'});const before=item.status;item.status=b.status;await save('enquiries.json',enquiries);await audit(req,me,'enquiry_status',item.name,`${before} → ${b.status}`);return send(res,200,{ok:true})}
@@ -148,6 +159,10 @@ if(range){res.setHeader('Content-Range',`bytes ${range.start}-${range.end}/${inf
 res.writeHead(range?206:200);if(req.method==='HEAD')return res.end();
 const stream=createReadStream(served,range||{});stream.on('error',()=>res.destroy());res.on('close',()=>stream.destroy());stream.pipe(res);
 }catch{return send(res,404,{error:'Halaman tidak ditemui'})}
-}catch(e){send(res,e.status===413?413:400,{error:e.status===413?'Permintaan terlalu besar.':'Permintaan tidak dapat diproses.'})}});
-server.requestTimeout=30000;server.headersTimeout=10000;
-server.listen(Number(process.env.PORT||4180),'127.0.0.1',()=>console.log('Ehsan TVET: http://localhost:'+(process.env.PORT||4180)));
+}catch(e){send(res,e.status===413?413:400,{error:e.status===413?'Permintaan terlalu besar.':'Permintaan tidak dapat diproses.'})}};
+}
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+  const server=http.createServer(await createApplication());
+  server.requestTimeout=30000;server.headersTimeout=10000;
+  server.listen(Number(process.env.PORT||4180),'127.0.0.1',()=>console.log('Ehsan TVET: http://localhost:'+(process.env.PORT||4180)));
+}

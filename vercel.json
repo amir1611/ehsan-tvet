@@ -40,5 +40,18 @@
         }
       ]
     }
+  ],
+  "functions": {
+    "api/[...path].mjs": {
+      "maxDuration": 60,
+      "includeFiles": "public/content.json",
+      "excludeFiles": "{data/**,tests/**,.env*,public/assets/**}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/assets/:name([a-f0-9]{24}\\.(?:jpg|png|webp))",
+      "destination": "/api/media/:name"
+    }
   ]
 }

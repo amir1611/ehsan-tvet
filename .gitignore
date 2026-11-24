@@ -5,3 +5,7 @@ data/*.json
 !.env.example
 data/uploads/
 .vercel/
+
+node_modules/
+.vercel
+.env*
